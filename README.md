@@ -1,141 +1,78 @@
 # YouTube Content Dashboard
 
-This Streamlit app shows YouTube performance by content type: Shorts, Videos, Live streams, and Podcasts.
+This dashboard shows YouTube performance by content type: Shorts, Videos, Live streams, and Podcasts.
 
-It is intended for a non-technical team to open in a browser, choose a date range, and review the latest performance without running reports manually.
+## Important links
 
-## What The Dashboard Shows
+- [Open the YouTube Content Dashboard](https://smevideodash.streamlit.app/)
+- [SMEMedia repository](https://github.com/SMEMedia/VideoDash)
 
-- KPI cards for each content type
-- Views over time by content type
-- A summary table with views, average views, video count, watch hours, and average view duration
-- A top videos table showing the strongest individual videos in the selected date range
+## Use the dashboard
 
-## Where The App Lives
+1. Choose **Dashboard**.
+2. Select a start date and end date.
+3. Review the KPI cards, trend chart, summary table, and top videos.
+4. Select **Refresh data** once when current YouTube information is needed.
 
-- GitHub repo: `myschne/VideoDash`
-- Streamlit app file: `app.py`
-- Streamlit Cloud main file path: `app.py`
-
-## Day-To-Day Use
-
-1. Open the Streamlit dashboard.
-2. In the left menu, choose **Dashboard**.
-3. Pick a start date and end date.
-4. Review the KPI cards, trend chart, summary table, and top videos table.
-5. Use **Refresh data** if you need the app to pull fresh YouTube data.
-
-The dashboard reads live data from YouTube. If YouTube has not finished processing very recent activity, the most recent day may change later.
-
-## What Each Content Type Means
-
-- **Shorts**: videos that are 60 seconds or shorter, excluding podcasts and live streams
-- **Videos**: regular non-live YouTube videos
-- **Lives**: videos with YouTube live-stream metadata
-- **Podcasts**: videos found in the configured podcast playlist
-
-Podcast videos are counted as Podcasts first so they are not double-counted as regular Videos.
-
-## Streamlit Secrets
-
-The dashboard needs YouTube credentials stored in Streamlit Cloud Secrets. Do not put real credentials in GitHub.
-
-In Streamlit Cloud:
-
-1. Open the app.
-2. Choose **Manage app**.
-3. Open **Settings**.
-4. Open **Secrets**.
-5. Add or update the blocks below.
-
-```toml
-youtube_redirect_uri = "https://videodash.streamlit.app/"
-
-[youtube]
-podcast_playlist_id = "PLEMmsgg0GMzCJZnBjaIyMBUPVx9hT0Ft0"
-
-[youtube_web_oauth_client]
-client_id = "YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com"
-project_id = "YOUR_GOOGLE_CLOUD_PROJECT_ID"
-auth_uri = "https://accounts.google.com/o/oauth2/auth"
-token_uri = "https://oauth2.googleapis.com/token"
-auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
-client_secret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET"
-redirect_uris = ["https://videodash.streamlit.app/"]
-
-[youtube_oauth_token]
-token = "OPTIONAL_ACCESS_TOKEN_FROM_RECONNECT_FLOW"
-refresh_token = "YOUR_YOUTUBE_REFRESH_TOKEN"
-token_uri = "https://oauth2.googleapis.com/token"
-client_id = "YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com"
-client_secret = "YOUR_GOOGLE_OAUTH_CLIENT_SECRET"
-scopes = [
-  "https://www.googleapis.com/auth/youtube.readonly",
-  "https://www.googleapis.com/auth/yt-analytics.readonly"
-]
-```
-
-After changing Secrets, save the page and wait for Streamlit to restart the app.
+Podcast videos are identified by the configured podcast playlist and are counted as Podcasts before other content types so they are not double-counted.
 
 ## Reconnect YouTube
 
-Use this when the dashboard says YouTube authorization expired or was revoked.
+Use this process when the dashboard says authorization expired or was revoked:
 
-1. Open the dashboard.
-2. In the left menu, choose **Reconnect YouTube**.
-3. Select **Start YouTube sign-in**.
-4. Select **Continue to Google**.
-5. Sign in with the Google account that owns or manages the YouTube channel.
-6. Approve the requested YouTube read-only permissions.
-7. When Google returns to Streamlit, copy the generated `[youtube_oauth_token]` block.
-8. In Streamlit Cloud, open **Manage app**, then **Settings**, then **Secrets**.
-9. Replace the old `[youtube_oauth_token]` section with the new block.
-10. Save, wait for the app to restart, and return to **Dashboard**.
+1. Choose **Reconnect YouTube**.
+2. Select **Start YouTube sign-in**, then **Continue to Google**.
+3. Sign in with an account that owns or manages the SME Media YouTube channel.
+4. Approve the requested read-only access.
+5. Follow the on-screen instructions to provide the renewed authorization to the Streamlit owner.
+6. After it is saved, return to **Dashboard** and refresh once.
 
-Streamlit does not allow the app to rewrite its own saved Secrets, so the copy-and-save step is required.
-
-## One-Time Google Setup
-
-The Google OAuth client must be a **Web application** client.
-
-In Google Cloud Console, the OAuth client needs:
-
-- YouTube Data API v3 enabled
-- YouTube Analytics API enabled
-- Authorized redirect URI matching `youtube_redirect_uri`
-- Access to the YouTube channel through the Google account used during reconnect
-
-Required scopes:
-
-```text
-https://www.googleapis.com/auth/youtube.readonly
-https://www.googleapis.com/auth/yt-analytics.readonly
-```
-
-## Local Use
-
-Most users should use the hosted Streamlit app. A technical administrator can run the app locally with:
-
-```powershell
-python -m pip install -r requirements.txt
-Copy-Item .streamlit\secrets.toml.example .streamlit\secrets.toml
-python -m streamlit run app.py
-```
-
-Before running locally, fill `.streamlit/secrets.toml` with real values. That file is ignored by Git and should not be committed.
-
-## Maintenance Checklist
-
-- Keep the Google account used for YouTube authorization active.
-- Refresh the YouTube token if the dashboard reports an authorization problem.
-- Keep the Streamlit app private if the YouTube data should not be public.
-- Do not commit `.streamlit/secrets.toml` or any real tokens to GitHub.
-- If the podcast playlist changes, update `podcast_playlist_id` in Streamlit Secrets.
+Never send authorization information through email, chat, GitHub, tickets, or screenshots.
 
 ## Troubleshooting
 
-If the dashboard shows an authorization error, use **Reconnect YouTube**.
+### No information appears for the selected dates
 
-If the dashboard shows no data for the selected dates, try a wider date range and confirm YouTube has processed analytics for that period.
+- Try a wider date range.
+- Confirm the channel published content during the period.
+- Allow YouTube time to process very recent analytics.
+- Select **Refresh data** once.
 
-If the Streamlit app fails immediately after a Secrets change, check for missing quotation marks, missing brackets, or duplicated TOML section names in Secrets.
+### A video is in the wrong content type
+
+- Confirm whether it is part of the configured podcast playlist.
+- Confirm whether YouTube identifies it as a live stream.
+- Record the video title, URL, expected type, and displayed type before escalating.
+
+### Podcast videos are missing
+
+- Confirm the videos are in the current podcast playlist.
+- If the playlist changed, contact the Streamlit or technical owner to update the saved playlist setting.
+- Refresh after the correction.
+
+### Authorization expired
+
+- Complete **Reconnect YouTube**.
+- Use an account that manages the correct channel.
+- If Google returns an access or redirect error, capture the message and contact the Google/YouTube and Streamlit owners.
+
+### Results do not match YouTube Studio
+
+- Confirm the same date range, timezone, channel, and metric.
+- Allow for YouTube processing delays.
+- Note whether Shorts, Videos, Live streams, and Podcasts are grouped differently in the two views.
+- Record both values and filters before escalating.
+
+### The dashboard will not open
+
+- Use the live link above.
+- Refresh the browser or try a private window.
+- Check [Streamlit Community Cloud](https://share.streamlit.io/) for an app status message.
+- Send the visible error and approximate time to the Streamlit owner.
+
+## Ongoing maintenance
+
+- Keep the channel-management account and Streamlit access assigned to current SME staff.
+- Reconnect YouTube only when the dashboard reports an authorization problem.
+- Review the podcast playlist setting whenever the official playlist changes.
+- Escalate credential, playlist, deployment, and code changes to the assigned technical owner.
